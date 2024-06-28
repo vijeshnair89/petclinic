@@ -26,8 +26,8 @@ phases:
   build:
     commands:
       - echo "Building image"
-      - docker build -t $docker_url/$docker_user/petclinic:latest . -f Dockerfile1
       - echo $docker_password | docker login -u $docker_user --password-stdin $docker_url
+      - docker build -t $docker_url/$docker_user/petclinic:latest . -f Dockerfile1
       - docker push $docker_url/$docker_user/petclinic:latest
   post_build:
     commands:
