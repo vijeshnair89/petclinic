@@ -1,0 +1,19 @@
+#!/bin/bash
+apt update
+apt install openjdk-11-jre-headless -y
+apt install maven -y
+cd /opt
+sudo wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.65/bin/apache-tomcat-9.0.65.tar.gz
+sudo tar -xvf apache-tomcat-9.0.65.tar.gz
+
+sed -i 's@/tomcat-users@user username="admin" password="admin1234" roles="admin-gui manager-gui"/>\n</tomcat-users@g' apache-tomcat-9.0.65/conf/tomcat-users.xml
+sed -i 's/<Valve/<!--<Valve/g' apache-tomcat-9.0.65/webapps/manager/META-INF/context.xml
+sed -i 's/<Valve/<!--<Valve/g' apache-tomcat-9.0.65/webapps/host-manager/META-INF/context.xml
+sed -i 's/<Manager/--><Manager/g' apache-tomcat-9.0.65/webapps/manager/META-INF/context.xml
+sed -i 's/<Manager/--><Manager/g' apache-tomcat-9.0.65/webapps/host-manager/META-INF/context.xml
+sh apache-tomcat-9.0.65/bin/startup.sh
+
+git clone https://github.com/vijeshnair89/Petclinic.git
+cd Petclinic
+mvn clean install
+cp /opt/Petclinic/target/petclinic.war /opt/apache-tomcat-9.0.65/webapps/petclinic.war

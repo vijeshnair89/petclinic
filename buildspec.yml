@@ -1,0 +1,34 @@
+version: 0.2
+
+env:
+  parameter-store:
+    docker_user: "docker-user"
+    docker_password: "docker-password"
+    docker_url: "docker-registry"
+phases:
+  install:
+    runtime-versions:
+      java: corretto11
+    commands:
+      - echo "Installing JDK 11"
+      - java -version # Verify the installed Java version
+      - echo "Installing Maven 3.9.8"
+      - curl -sL https://archive.apache.org/dist/maven/maven-3/3.9.8/binaries/apache-maven-3.9.8-bin.tar.gz | tar -xz -C /opt
+      - export M2_HOME=/opt/apache-maven-3.9.8
+      - export PATH=$M2_HOME/bin:$PATH
+      - mvn -version 
+      
+  pre_build:
+    commands:
+      - echo "Building code"
+      - mvn clean package
+      
+  build:
+    commands:
+      - echo "Building image"
+      - docker build -t $docker_url/$docker_user/petclinic:latest . -f Dockerfile1
+      - echo $docker_password | docker login -u $docker_user --password-stdin $docker_url
+      - docker push $docker_url/$docker_user/petclinic:latest
+  post_build:
+    commands:
+      - echo "Build is successful!! Eurekaaaaaa!!"
