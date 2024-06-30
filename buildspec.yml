@@ -7,6 +7,7 @@ env:
     docker_url: "docker-registry"
 phases:
   install:
+    on-failure: ABORT
     runtime-versions:
       java: corretto11
     commands:
@@ -19,17 +20,20 @@ phases:
       - mvn -version 
       
   pre_build:
+    on-failure: ABORT
     commands:
       - echo "Building code"
       - mvn clean package
       
   build:
+    on-failure: ABORT
     commands:
       - echo "Building image"
       - echo $docker_password | docker login -u $docker_user --password-stdin $docker_url
       - docker build -t $docker_url/$docker_user/petclinic:latest . -f Dockerfile1
       - docker push $docker_url/$docker_user/petclinic:latest
   post_build:
+    on-failure: ABORT
     commands:
       - echo "Build is successful!! Eurekaaaaaa!!"
 artifacts:
